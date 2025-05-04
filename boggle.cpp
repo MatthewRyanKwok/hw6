@@ -105,7 +105,7 @@ bool boggleHelper(const std::set<std::string>& dict, const std::set<std::string>
 
 	//bool shorterFound = true;
 
-	if (prefix.find(word) == prefix.end()) // && dict.find(word) == dict.end()) {
+	if (prefix.find(word) == prefix.end()) {// && dict.find(word) == dict.end()) {
 		return false;
 		//bool shorterFound = true;
 	}
@@ -113,28 +113,26 @@ bool boggleHelper(const std::set<std::string>& dict, const std::set<std::string>
 	bool addedLonger = false;
 
 	if (dict.find(word) != dict.end()) {
-		bool shorterFound = false;
+		
+		std::set<std::string>::iterator it = result.lower_bound(word);
+		bool shouldInsert = true;
 
-		std::set<std::string>::iterator it;
-		for (it = result.begin(); it != result.end(); it++) {
-			const std::string& existing = *it;
-
-			if (word.find(existing) == 0 && word.length() > existing.length()) {
+		if (it != result.begin()) {
+			--it;
+			if (word.find(*it) == 0 && word.length() > it->length()) {
 				result.erase(it);
-				break;
 			}
-			if (existing.find(word) == 0 && existing.length() >= word.length()) {
-				shorterFound = false;
-				break;
+			else if (it->find(word) == 0 && it->length() >= word.length()) {
+				shouldInsert = false;
 			}
 		}
-		if (shorterFound) {
+
+		if (shouldInsert) {
 			result.insert(word);
 			addedLonger = true;
 		}
 	}
-	bool addedInSubpath = boggleHelper(dict, prefix, board, word, result, r + dr, c + dc, dr, dc);
 
+	bool addedInSubpath = boggleHelper(dict, prefix, board, word, result, r + dr, c + dc, dr, dc);
 	return addedLonger || addedInSubpath;
-	
 }
